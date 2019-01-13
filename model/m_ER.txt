@@ -1,0 +1,33 @@
+
+model{
+for (i in 1:n) {
+
+n1s1[i] ~ dbin(p1s1[i], n1ss[i])
+n0s1[i] ~ dbin(p0s1[i], n0ss[i])
+
+probit(p1s1[i]) <- u + delta[1, i]
+probit(p0s1[i]) <- v + delta[2, i]
+# u1[i] <- phi(alpha_u)
+# v1[i] <- phi(alpha_v)
+
+delta[1:2, i] ~ dmnorm(c(0, 0), Omega)
+
+} 
+
+uout <- phi(u/sqrt(1+Sigma[1,1]))
+vout <- phi(v/sqrt(1+Sigma[2,2]))
+diff <- phi(u/sqrt(1+Sigma[1,1]))-phi(v/sqrt(1+Sigma[2,2]))
+
+
+# priors
+I[1,1] <- 1
+I[2,2] <- 1
+I[1,2] <- 0
+I[2,1] <- 0
+Omega ~  dwish (I[,], 3)
+Sigma <- inverse(Omega)
+
+u ~ dnorm(0, 0.001)
+v ~ dnorm(0, 0.001)
+
+}

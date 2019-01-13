@@ -1,0 +1,29 @@
+model{
+for (i in 1:N) {
+
+y[i] ~ dbin(cp[i], n[i])
+cp[i]<-phi(mu[r[i]]+ vi[id[i], r[i]])
+# probit(cp[i]) <- mu[r[i]] + vi[id[i], r[i]])
+}
+
+for (j in 1:M) {
+vi[j, 1:2] ~ dmnorm(c(0, 0), Omega)
+} 
+
+uout <- phi(mu[2]/sqrt(1+Sigma[1,1]))
+vout <- phi(mu[1]/sqrt(1+Sigma[2,2]))
+diff <- phi(mu[2]/sqrt(1+Sigma[1,1]))-phi(mu[1]/sqrt(1+Sigma[2,2]))
+
+
+# priors
+I[1,1] <- 1
+I[1,2] <- 0
+I[2,1] <- 0
+I[2,2] <- 1
+Omega ~  dwish(I[, ], 3)
+Sigma <- inverse(Omega)
+
+mu[1] ~ dnorm(0, 0.001)
+mu[2] ~ dnorm(0, 0.001)
+
+}

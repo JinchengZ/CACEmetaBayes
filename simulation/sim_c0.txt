@@ -1,0 +1,49 @@
+model{
+for (i in 1:n1) {
+
+R0_4[i, ] ~ dmulti(prob0[i, ], N0[i])
+prob0[i, 1] <- pi_n[i]*(1-s1[i]) + pi_c[i]*(1-v1[i])
+prob0[i, 2] <- pi_n[i]*s1[i] + pi_c[i]*v1[i]
+prob0[i, 3] <- pi_a[i]*(1-b1[i])
+prob0[i, 4] <- pi_a[i]*b1[i]
+
+R1_4[i, ] ~ dmulti(prob1[i, ], N1[i])
+prob1[i, 1] <- pi_n[i]*(1-s1[i])
+prob1[i, 2] <- pi_n[i]*s1[i]
+prob1[i, 3] <- pi_c[i]*(1-u1[i])+pi_a[i]*(1-b1[i])
+prob1[i, 4] <- pi_c[i]*u1[i]+pi_a[i]*b1[i]
+
+
+probit(u1[i]) <- alpha_u
+probit(v1[i]) <- alpha_v
+
+n[i] <- alpha_n
+a[i] <- alpha_a
+pi_n[i] <- exp(n[i])/(1+exp(n[i])+exp(a[i]))
+pi_a[i] <- exp(a[i])/(1+exp(n[i])+exp(a[i]))
+pi_c[i] <- 1-pi_a[i]-pi_n[i]
+
+logit(s1[i]) <- alpha_s1
+logit(b1[i]) <- alpha_b1
+} 
+
+CACE <- phi(alpha_u)-phi(alpha_v)
+
+pin <- exp(alpha_n)/(1+exp(alpha_n)+exp(alpha_a))
+pia <- exp(alpha_a)/(1+exp(alpha_n)+exp(alpha_a))
+pic <- 1-pia-pin
+u1out <- phi(alpha_u)
+v1out <- phi(alpha_v)
+s1out <- ilogit(alpha_s1)
+b1out <- ilogit(alpha_b1)
+
+# priors
+alpha_n ~  dnorm(0, 0.16)
+alpha_a ~ dnorm(0, 0.16)
+
+alpha_s1 ~  dnorm(0, 0.25)
+alpha_b1 ~  dnorm(0, 0.25)
+
+alpha_u ~  dnorm(0, 0.25)
+alpha_v ~  dnorm(0, 0.25)
+}

@@ -1,0 +1,105 @@
+model{
+for (i in 1:n1) {
+
+R0_4[i, ] ~ dmulti(prob0[i, ], N0_4[i])
+prob0[i, 1] <- pi_n[i]*(1-s1[i]) + pi_c[i]*(1-v1[i])
+prob0[i, 2] <- pi_n[i]*s1[i] + pi_c[i]*v1[i]
+prob0[i, 3] <- pi_a[i]*(1-b1[i])
+prob0[i, 4] <- pi_a[i]*b1[i]
+
+R1_4[i, ] ~ dmulti(prob1[i, ], N1_4[i])
+prob1[i, 1] <- pi_n[i]*(1-s1[i])
+prob1[i, 2] <- pi_n[i]*s1[i]
+prob1[i, 3] <- pi_c[i]*(1-u1[i])+pi_a[i]*(1-b1[i])
+prob1[i, 4] <- pi_c[i]*u1[i]+pi_a[i]*b1[i]
+} 
+
+for (i in (n1+1):(n1+n2)) {
+
+R0_4[i, ] ~ dmulti(prob0[i, ], N0_4[i])
+prob0[i, 1] <- pi_n[i]*(1-s1[i]) + pi_c[i]*(1-v1[i])
+prob0[i, 2] <- pi_n[i]*s1[i] + pi_c[i]*v1[i]
+prob0[i, 3] <- pi_a[i]*(1-b1[i])
+prob0[i, 4] <- pi_a[i]*b1[i]
+
+R1_2[i, 2] ~ dbin(p1[i], N1_2[i])
+p1[i] <- pi_n[i]*s1[i] + pi_c[i]*u1[i] + pi_a[i]*b1[i]
+} 
+
+for (i in (n1+n2+1):(n1+n2+n3)) {
+
+R0_2[i, 2] ~ dbin(p0[i], N0_2[i])
+p0[i] <-  pi_n[i]*s1[i] + pi_c[i]*v1[i] + pi_a[i]*b1[i]
+
+R1_4[i, ] ~ dmulti(prob1[i, ], N1_4[i])
+prob1[i, 1] <- pi_n[i]*(1-s1[i])
+prob1[i, 2] <- pi_n[i]*s1[i]
+prob1[i, 3] <- pi_c[i]*(1-u1[i])+pi_a[i]*(1-b1[i])
+prob1[i, 4] <- pi_c[i]*u1[i]+pi_a[i]*b1[i]
+} 
+
+for (i in (n1+n2+n3+1):(n1+n2+n3+n4)) {
+
+R0_2[i, 2] ~ dbin(p0[i], N0_2[i])
+p0[i] <-  pi_n[i]*s1[i] + pi_c[i]*v1[i] + pi_a[i]*b1[i]
+
+R1_2[i, 2] ~ dbin(p1[i], N1_2[i])
+p1[i] <- pi_n[i]*s1[i] + pi_c[i]*u1[i] + pi_a[i]*b1[i]
+} 
+
+for (i in 1:(n1+n2+n3+n4)) {
+
+miss_r0[i] ~ dbern(p_m0[i])
+logit(p_m0[i]) <- gamma_00 + gamma_10*logit(v1[i])
+
+miss_r1[i] ~ dbern(p_m1[i])
+logit(p_m1[i]) <- gamma_01 + gamma_11*logit(u1[i])
+
+probit(u1[i]) <- alpha_u + delta_u[i]
+delta_u[i] ~ dnorm(0, tau_u)
+probit(v1[i]) <- alpha_v
+
+n[i] <- alpha_n + delta_n[i]
+delta_n[i] ~ dnorm(0, tau_n)
+a[i] <- alpha_a + delta_a[i]
+delta_a[i] ~ dnorm(0, tau_a)
+pi_n[i] <- exp(n[i])/(1+exp(n[i])+exp(a[i]))
+pi_a[i] <- exp(a[i])/(1+exp(n[i])+exp(a[i]))
+pi_c[i] <- 1-pi_a[i]-pi_n[i]
+
+logit(s1[i]) <- alpha_s1 + delta_s[i]
+delta_s[i] ~ dnorm(0, tau_s)
+logit(b1[i]) <- alpha_b1
+} 
+
+CACE <- phi(alpha_u/sqrt(1+sigma_u^2))-phi(alpha_v)
+
+pin <- exp(alpha_n)/(1+exp(alpha_n)+exp(alpha_a))
+pia <- exp(alpha_a)/(1+exp(alpha_n)+exp(alpha_a))
+pic <- 1-pia-pin
+u1out <- phi(alpha_u)
+v1out <- phi(alpha_v)
+s1out <- ilogit(alpha_s1)
+b1out <- ilogit(alpha_b1)
+
+# priors
+alpha_n ~  dnorm(0, 0.16)
+tau_n ~ dgamma(2, 2)
+sigma_n <- 1/sqrt(tau_n)
+alpha_a ~ dnorm(0, 0.16)
+tau_a ~ dgamma(2, 2)
+sigma_a <- 1/sqrt(tau_a)
+
+alpha_s1 ~  dnorm(0, 0.25)
+tau_s ~ dgamma(2, 2)
+sigma_s <- 1/sqrt(tau_s)
+alpha_b1 ~  dnorm(0, 0.25)
+
+alpha_u ~  dnorm(0, 0.0001)
+tau_u ~ dgamma(2, 2)
+sigma_u <- 1/sqrt(tau_u)
+alpha_v ~  dnorm(0, 0.0001)
+
+gamma_00 ~ dlogis(0,1)
+gamma_01 ~ dlogis(0,1)
+}
