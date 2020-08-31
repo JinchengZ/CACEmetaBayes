@@ -1,7 +1,6 @@
 # CACEmetaBayes
 
-R code and data for the manuscript "A Bayesian Hierarchical CACE Model Accounting for Incomplete Noncompliance Data in Meta-analysis"
-
+R code and data for the manuscript "A Bayesian Hierarchical CACE Model Accounting for Incomplete Noncompliance With Application to a Meta-analysis of Epidural Analgesia on Cesarean Section".
 
 JAGS is required to run models. Under the master folder “CACEmetaBayes”, 
 
