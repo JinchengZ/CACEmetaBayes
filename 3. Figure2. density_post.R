@@ -127,6 +127,7 @@ samps3 <- read.table("output/samps3_CACE.txt")
 samps4 <- read.table("output/samps4_CACE.txt")
 samps5 <- read.table("output/samps5_CACE.txt")
 density(samps1$x)
+
 plot(density(samps1$x), col="blue", main="", 
      ylim=c(0, 45), xlim=c(-0.02, 0.11), #ylab="Density", # yaxt='n', 
      xlab=expression(paste("Posterior ", theta^"CACE")))
@@ -134,5 +135,15 @@ lines(density(samps2$x), col="red", lty=2)
 lines(density(samps3$x), col="brown", lty=3)
 lines(density(samps4$x), col="green", lty=4)
 lines(density(samps5$x), col="black", lty=5)
-legend(0.07, 41, legend=c("Model I", "Model IIf", "Model IIIe", "Model IVa", "Model Vc"),
-       col=c("blue", "red", "brown", "green", "black"), lty=1:5, cex=0.9, box.lty=0)
+legend(0.05, 41, 
+       legend=c("Model I (None)", 
+                expression(paste("Model IIf (", delta[ia], ")")), 
+                expression(paste("Model IIIe (", delta[i][n], ", ", 
+                                 delta[ia], ")" )), 
+                expression(paste("Model IVa (", delta[i][n], ", ", 
+                                 delta[ia], ", ", delta[is], ")" )), 
+                expression(paste("Model Vc (", delta[i][n], ", ", 
+                                 delta[ia], ", ", delta[is],  ", ", delta[iu], ")" )) ),
+       col=c("blue", "red", "brown", "green", "black"), 
+       lty=1:5, box.lty=0)
+
